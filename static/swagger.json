@@ -1,0 +1,738 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "description": "API for technical test",
+      "version": "1.0.0",
+      "title": "API for technical test",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "paths": {
+      "/register": {
+        "post": {
+          "tags": [
+            "Authorization"
+          ],
+          "parameters": [{
+            "name": "user",
+            "in": "body",
+            "description": "The user to create.",
+            "schema": {
+              "type": "object",
+              "required": ["username", "password"],
+              "properties":{
+                "username": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }],
+          "summary": "Allows to create a user to be able to consume the api",
+          "responses": {
+            "200": {
+              "description": "The user was successfully created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example":{
+                    "message": "registered successfully"
+                  }
+                }
+              } 
+            },
+            "400": {
+              "description": "One of the optional parameter has something wrong"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Authorization"
+        ],
+        "security": [{
+          "type": "http",
+          "scheme": "basic"
+        }],
+        "summary": "Allows to create a user to be able to consume the api",
+        "responses": {
+          "200": {
+            "description": "The user was successfully created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example":{
+                  "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJwdWJsaWNfaWQiOiI0NzcxNTcwMy1kNDkxLTQwN2QtYTY4Yy1mYjEzNzJlOGI2MTAiLCJleHAiOjE2NTc3NzQ1ODh9.Dsmt5GkpFqRlv5UETI1hajIRcf-KeJ69aDGvXbqy33Q"
+                }
+              }
+            } 
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example":{
+                  "message": "Could not verify"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "One of the optional parameter has something wrong"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+  },
+      "/tasks": {
+        "get": {
+          "tags": [
+            "Tasks"
+          ],
+          "security": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+          },
+          "parameters": [
+            {
+              "name": "completed",
+              "in": "query",
+              "description": "If the task is completed or not",
+              "required": false,
+              "type": "bool"
+            },
+            {
+              "name": "title",
+              "in": "query",
+              "description": "Filter by the title of the task",
+              "required": false,
+              "type": "string"
+            }
+          ],
+          "summary": "Return a list of all tasks and this list can be filter by task title and if the task is complete or not",
+          "responses": {
+            "200": {
+              "description": "A list of all tasks requested",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "user_id": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "type": "integer"
+                            },
+                            "title": {
+                              "type": "string"
+                            },
+                            "completed": {
+                              "type": "bool"
+                            }
+                          }
+                        }
+                      },
+                      "total_items":{
+                        "type": "integer"
+                      }
+                    }
+                  },
+                  "example":{
+                    "data": [
+                      {
+                      "completed": false,
+                      "id": 194,
+                      "title": "sed ut vero sit molestiae",
+                      "user_id": 10
+                      },
+                      {
+                          "completed": false,
+                          "id": 200,
+                          "title": "ipsam aperiam voluptates qui",
+                          "user_id": 10
+                      }
+                    ],
+                    "total_items": 2
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "message": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "example":{
+                    "message": "A valid token is missing"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "One of the optional parameter has something wrong"
+            },
+            "500": {
+              "description": "Internal server error"
+            }
+          }
+        }
+    },
+    "/tasks/{id}": {
+      "get": {
+        "tags": [
+          "Tasks"
+        ],
+        "security": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the task that you want to look up",
+            "required": false,
+            "type": "integer"
+          }
+        ],
+        "summary": "Return an specific task",
+        "responses": {
+          "200": {
+            "description": "A list of all tasks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer"
+                    },
+                    "id": {
+                      "type": "integer"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "completed": {
+                      "type": "bool"
+                    }
+                  }
+                },
+                "example":{
+                  "user_id": 3,
+                  "id": 49,
+                  "title": "ut necessitatibus aut maiores debitis officia blanditiis velit et",
+                  "completed": false
+                }
+              }
+            } 
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example":{
+                  "message": "A valid token is missing"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The task id does not exist"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+  },
+  "/users": {
+    "get": {
+      "tags": [
+        "Users"
+      ],
+      "security": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "summary": "Return a list of users and the total number of user returned",
+      "responses": {
+        "200": {
+          "description": "A list of all users and the number of user returned",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "integer"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "email": {
+                          "type": "bool"
+                        },
+                        "address": {
+                          "type": "object",
+                          "properties": {
+                            "street": {
+                              "type": "string"
+                            },
+                            "suite": {
+                              "type": "string"
+                            },
+                            "city": {
+                              "type": "string"
+                            },
+                            "zipcode": {
+                              "type": "string"
+                            },
+                            "geo": {
+                              "type": "object",
+                              "properties": {
+                                "lat": {
+                                  "type": "string"
+                                },
+                                "lng": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "phone": {
+                          "type": "string"
+                        },
+                        "website": {
+                          "type": "string"
+                        },
+                        "company": {
+                          "type": "object",
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            },
+                            "catchPhrase": {
+                              "type": "string"
+                            },
+                            "bs": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "total_items": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example":{
+                "data": [
+                    {
+                        "address": {
+                            "city": "Gwenborough",
+                            "geo": {
+                                "lat": "-37.3159",
+                                "lng": "81.1496"
+                            },
+                            "street": "Kulas Light",
+                            "suite": "Apt. 556",
+                            "zipcode": "92998-3874"
+                        },
+                        "company": {
+                            "bs": "harness real-time e-markets",
+                            "catchPhrase": "Multi-layered client-server neural-net",
+                            "name": "Romaguera-Crona"
+                        },
+                        "email": "Sincere@april.biz",
+                        "id": 1,
+                        "name": "Leanne Graham",
+                        "phone": "1-770-736-8031 x56442",
+                        "username": "Bret",
+                        "website": "hildegard.org"
+                    },
+                    {
+                        "address": {
+                            "city": "Wisokyburgh",
+                            "geo": {
+                                "lat": "-43.9509",
+                                "lng": "-34.4618"
+                            },
+                            "street": "Victor Plains",
+                            "suite": "Suite 879",
+                            "zipcode": "90566-7771"
+                        },
+                        "company": {
+                            "bs": "synergize scalable supply-chains",
+                            "catchPhrase": "Proactive didactic contingency",
+                            "name": "Deckow-Crist"
+                        },
+                        "email": "Shanna@melissa.tv",
+                        "id": 2,
+                        "name": "Ervin Howell",
+                        "phone": "010-692-6593 x09125",
+                        "username": "Antonette",
+                        "website": "anastasia.net"
+                    }
+                ],
+                "total_items": 2
+            }
+            }
+          }
+        },
+        "401": {
+          "description": "Unauthorized",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example":{
+                "message": "A valid token is missing"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "One of the optional parameter has something wrong"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  }
+  ,
+  "/users/{user_id}": {
+    "get": {
+      "tags": [
+        "Users"
+      ],
+      "security": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "description": "The id of the user that you want to look up",
+          "required": false,
+          "type": "integer"
+        }
+      ],
+      "summary": "Return an specific user",
+      "responses": {
+        "200": {
+          "description": "The data of the user found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "bool"
+                  },
+                  "address": {
+                    "type": "object",
+                    "properties": {
+                      "street": {
+                        "type": "string"
+                      },
+                      "suite": {
+                        "type": "string"
+                      },
+                      "city": {
+                        "type": "string"
+                      },
+                      "zipcode": {
+                        "type": "string"
+                      },
+                      "geo": {
+                        "type": "object",
+                        "properties": {
+                          "lat": {
+                            "type": "string"
+                          },
+                          "lng": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "phone": {
+                    "type": "string"
+                  },
+                  "website": {
+                    "type": "string"
+                  },
+                  "company": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "catchPhrase": {
+                        "type": "string"
+                      },
+                      "bs": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "example":  {
+                "id": 8,
+                "name": "Nicholas Runolfsdottir V",
+                "username": "Maxime_Nienow",
+                "email": "Sherwood@rosamond.me",
+                "address": {
+                  "street": "Ellsworth Summit",
+                  "suite": "Suite 729",
+                  "city": "Aliyaview",
+                  "zipcode": "45169",
+                  "geo": {
+                    "lat": "-14.3990",
+                    "lng": "-120.7677"
+                  }
+                },
+                "phone": "586.493.6943 x140",
+                "website": "jacynthe.com",
+                "company": {
+                  "name": "Abernathy Group",
+                  "catchPhrase": "Implemented secondary concept",
+                  "bs": "e-enable extensible e-tailers"
+                }
+              }
+            }
+          } 
+        },
+        "401": {
+          "description": "Unauthorized",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example":{
+                "message": "A valid token is missing"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "The user does not exist"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  },
+  "/users/{user_id}/tasks": {
+    "get": {
+      "tags": [
+        "User tasks"
+      ],
+      "security": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "parameters": [
+        {
+          "name": "user_id",
+          "in": "path",
+          "description": "The id of the user that you want to look up for their tasks",
+          "required": false,
+          "type": "integer"
+        },
+        {
+          "name": "completed",
+          "in": "query",
+          "description": "If the task is completed or not",
+          "required": false,
+          "type": "bool"
+        },
+        {
+          "name": "title",
+          "in": "query",
+          "description": "Filter by the title of the task",
+          "required": false,
+          "type": "string"
+        }
+      ],
+      "summary": "Return a list of tasks of an specific user",
+      "responses": {
+        "200": {
+          "description": "A list of all the task of the user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "user_id": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "completed": {
+                          "type": "bool"
+                        }
+                      }
+                    }
+                  },
+                  "total_items":{
+                    "type": "integer"
+                  }
+                }
+              },
+              "example":{
+                "data": [
+                  {
+                  "completed": false,
+                  "id": 194,
+                  "title": "sed ut vero sit molestiae",
+                  "user_id": 10
+                  },
+                  {
+                      "completed": false,
+                      "id": 200,
+                      "title": "ipsam aperiam voluptates qui",
+                      "user_id": 10
+                  }
+                ],
+                "total_items": 2
+              }
+            }
+          }
+        },
+        "401": {
+          "description": "Unauthorized",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example":{
+                "message": "A valid token is missing"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "The user does not exist"
+        },
+        "500": {
+          "description": "Internal server error"
+        }
+      }
+    }
+  }
+
+    }
+}
